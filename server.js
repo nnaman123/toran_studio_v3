@@ -16,9 +16,23 @@ const apiRoutes = require('./routes/api');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser:true, useUnifiedTopology:true })
-  .then(()=>console.log('MongoDB connected'))
-  .catch(err=>console.error('MongoDB error:', err.message));
+async function connectDB() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      ssl: true,
+      tlsAllowInvalidCertificates: true,
+      serverSelectionTimeoutMS: 20000
+    });
+    console.log("✅ Connected to MongoDB Atlas");
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err.message);
+    process.exit(1);
+  }
+}
+connectDB();
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname,'public','uploads')));
