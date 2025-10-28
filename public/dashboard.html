@@ -1,0 +1,61 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Dashboard - Toran Studio</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<nav class="topnav">
+  <div class="logo"><a href="/">Toran Studio</a></div>
+  <div class="links">
+    <a href="/">Home</a>
+<a href="/buy">Buy</a><a href="/customize">Customise</a><a href="/cart">Cart</a>
+    <a id="authlink" href="/auth/google">Sign in</a>
+    
+  </div>
+</nav>
+
+
+<main>
+<h2 style="text-align:center">Your Dashboard</h2>
+<section style="max-width:900px;margin:0 auto">
+<h3>Your custom requests</h3>
+<div id="mycustoms"></div>
+<h3>Your cart</h3>
+<div id="mycart"></div>
+</section>
+</main>
+
+<div id="profilePic"></div>
+
+<script>
+async function load(){
+  const r1 = await fetch('/api/custom/my'); const j1 = await r1.json();
+  const el = document.getElementById('mycustoms');
+  if(j1.list.length===0) el.innerHTML='<p>No custom requests yet.</p>';
+  else j1.list.forEach(it=>{
+    el.innerHTML += `<div class="card"><strong>Status:</strong> ${it.status} <span class="tag ${it.status==='approved'?'approved':(it.status==='pending'?'pending':'rejected')}">${it.status==='approved'?'Custom':''}</span><br>Message:${it.message}<br>Price:${it.price||'-'}<br>Comments:${it.comments||'-'}${it.image ? '<br><img src="'+it.image+'" style="max-width:200px">':''}</div>`;
+  });
+
+  const r2 = await fetch('/api/cart'); const j2 = await r2.json();
+  const c = document.getElementById('mycart');
+  if(!j2.items || j2.items.length===0) c.innerHTML='<p>Cart is empty</p>';
+  else {
+    j2.items.forEach((i,idx)=>{
+      c.innerHTML += `<div class="card">${i.isCustom?'<span class="customTag">Custom</span>':''} ${i.name} x ${i.qty} - ₹${i.price} <button onclick="remove(${idx})">Remove</button></div>`;
+    });
+  }
+}
+
+async function remove(idx){
+  await fetch('/api/cart/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idx})});
+  location.reload();
+}
+
+async function initNav(){
+  try{
+    const r = await fetch('/api/me'); const j = await r.json();
+    const auth = document.getElementById('authlink');
+    if(j.loggedIn){ auth.textContent='Profile'; auth.href='/profile'; const pp = document.getElementById('profilePic'); if(j.user.photo) pp.innerHTML = `<a href="/profile"><img src="${j.user.photo}" class="pp"></a>`;}
+    else { auth.textContent='Sign in'; auth.href='/auth/google'; }
+  }catch(e){}
+}
+
+load(); initNav();
+</script>
+</body></html>

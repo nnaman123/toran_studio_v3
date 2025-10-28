@@ -1,0 +1,43 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Toran Studio</title><link rel="stylesheet" href="/css/style.css"></head>
+<body>
+<nav class="topnav">
+  <div class="logo"><a href="/">Toran Studio</a></div>
+  <div class="links" id="navlinks">
+    <a href="/buy">Buy</a>
+    <a href="/customize">Customise</a>
+    <a href="/cart">Cart</a>
+    <a id="adminlink" href="/admin" style="display:none">Settings</a>
+    <a id="authlink" href="/auth/google">Sign in</a>
+  </div>
+</nav>
+<main class="hero">
+  <h1>Handcrafted torans — modern & neutral</h1>
+  <p>Timeless designs for every home.</p>
+  <a class="btn" href="/buy">Shop Now</a>
+</main>
+
+<div id="profilePic"></div>
+
+<script>
+async function initNav(){
+  try{
+    const r = await fetch('/api/me'); const j = await r.json();
+    const auth = document.getElementById('authlink');
+    const admin = document.getElementById('adminlink');
+    if(j.loggedIn){
+      auth.textContent='Profile'; auth.href='/profile';
+      if(j.user.role==='owner') admin.style.display='inline';
+      // show profile pic bottom-right
+      const pp = document.getElementById('profilePic');
+      if(j.user.photo){
+        pp.innerHTML = `<a href="/profile"><img src="${j.user.photo}" alt="profile" class="pp"></a>`;
+      }
+    } else {
+      auth.textContent='Sign in'; auth.href='/auth/google';
+    }
+  }catch(e){}
+}
+initNav();
+</script>
+</body></html>

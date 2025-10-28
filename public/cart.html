@@ -1,0 +1,50 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Cart - Toran Studio</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<nav class="topnav">
+  <div class="logo"><a href="/">Toran Studio</a></div>
+  <div class="links" id="navlinks">
+    <a href="/">Home</a>
+    <a href="/buy">Buy</a>
+    <a href="/customize">Customise</a>
+    <a id="adminlink" href="/admin" style="display:none">Settings</a>
+    <a id="authlink" href="/auth/google">Sign in</a>
+  </div>
+</nav>
+
+<main>
+<h2 style="text-align:center">Your Cart</h2>
+<div id="cartItems" style="max-width:900px;margin:0 auto"></div>
+</main>
+
+<div id="profilePic"></div>
+
+<script>
+async function load(){
+  const r = await fetch('/api/cart'); const j = await r.json();
+  const wrap = document.getElementById('cartItems');
+  if(!j.items || j.items.length===0) { wrap.innerHTML='<p>Cart is empty</p>'; return; }
+  let total = 0;
+  j.items.forEach((it, idx)=>{
+    total += (it.price||0)*it.qty;
+    wrap.innerHTML += `<div class="card">${it.isCustom?'<span class="customTag">Custom</span>':''} ${it.name} x ${it.qty} - ₹${it.price} <button onclick="remove(${idx})">Remove</button></div>`;
+  });
+  wrap.innerHTML += `<div class="card"><strong>Total: ₹${total}</strong></div>`;
+}
+
+async function remove(idx){ await fetch('/api/cart/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idx})}); location.reload(); }
+
+async function initNav(){
+  try{
+    const r = await fetch('/api/me'); const j = await r.json();
+    const auth = document.getElementById('authlink');
+    const admin = document.getElementById('adminlink');
+    if(j.loggedIn){
+      auth.textContent='Profile'; auth.href='/profile';
+      if(j.user.role==='owner') admin.style.display='inline';
+      const pp = document.getElementById('profilePic'); if(j.user.photo) pp.innerHTML = `<a href="/profile"><img src="${j.user.photo}" class="pp"></a>`;
+    } else { auth.textContent='Sign in'; auth.href='/auth/google'; }
+  }catch(e){}
+}
+load(); initNav();
+</script>
+</body></html>

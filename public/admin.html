@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Admin - Toran Studio</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<nav class="topnav"><div class="logo"><a href="/">Toran Studio</a></div><div class="links"><a href="/">Home</a><a href="/buy">Buy</a></div></nav>
+<main>
+<h2 style="text-align:center">Admin Panel</h2>
+<div id="list" style="max-width:900px;margin:0 auto"></div>
+</main>
+<div id="profilePic"></div>
+<script>
+async function load(){
+  const r = await fetch('/api/admin/customs'); const j = await r.json();
+  const list = document.getElementById('list');
+  if(!j.items) { list.innerHTML='<p>No access or no items</p>'; return; }
+  j.items.forEach(it=>{
+    list.innerHTML += `<div class="card"><strong>${it.email} (${it.userId?it.userId.name:''})</strong><br>${it.message}<br>${it.image?'<img src="'+it.image+'" style="max-width:200px">':''}<br>Status:${it.status} Viewed:${it.viewed} Price:${it.price||'-'} Comments:${it.comments||'-'}<br>
+    <button onclick="act('${it._id}','viewed')">Mark viewed</button>
+    <button onclick="act('${it._id}','approve')">Approve</button>
+    <button onclick="act('${it._id}','reject')">Reject</button>
+    </div>`;
+  });
+}
+async function act(id, action){
+  let payload={id, action};
+  if(action==='approve'){ const price = prompt('Set price'); const comments = prompt('Comments'); payload.price = Number(price); payload.comments = comments; }
+  if(action==='reject'){ const comments = prompt('Comments'); payload.comments = comments; }
+  const r = await fetch('/api/admin/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const j = await r.json();
+  if(j.ok) location.reload(); else alert('Error');
+}
+async function initNav(){ try{ const r = await fetch('/api/me'); const j = await r.json(); const pp = document.getElementById('profilePic'); if(j.loggedIn && j.user.photo) pp.innerHTML=`<a href='/profile'><img src='${j.user.photo}' class='pp'></a>`;}catch(e){} }
+load(); initNav();
+</script>
+</body></html>

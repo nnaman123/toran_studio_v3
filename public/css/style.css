@@ -1,0 +1,17 @@
+:root{--bg:#f5f6f7;--card:#ffffff;--muted:#666;--accent:#6b8e8a;--custom:#ffcc00}
+*{box-sizing:border-box}body{font-family:Inter,Arial;color:#222;background:var(--bg);margin:0}
+.topnav{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:rgba(255,255,255,0.6);backdrop-filter:blur(6px)}
+.topnav .logo a{font-weight:700;color:#123}
+.topnav .links a{margin-left:12px;color:var(--accent);text-decoration:none}
+.hero{padding:50px;text-align:center}
+.btn{background:var(--accent);color:white;padding:10px 14px;border-radius:8px;text-decoration:none}
+.products{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:20px}
+.product{width:300px;background:var(--card);padding:12px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.06)}
+.product img{width:100%;height:180px;object-fit:cover;border-radius:8px}
+.card{background:var(--card);padding:12px;border-radius:8px;margin:8px 0;box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+input,textarea{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:1px solid #ddd}
+.pp{width:56px;height:56px;border-radius:50%;position:fixed;right:18px;bottom:18px;border:3px solid white}
+.profileBig{width:120px;border-radius:80px}
+.customTag{background:var(--custom);padding:4px 8px;border-radius:6px;margin-right:8px;font-weight:700}
+.tag.pending{background:orange;color:white;padding:4px 8px;border-radius:6px}
+.tag.approved{background:green;color:white;padding:4px 8px;border-radius:6px}

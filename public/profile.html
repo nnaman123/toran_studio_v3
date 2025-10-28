@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Profile - Toran Studio</title><link rel="stylesheet" href="/css/style.css"></head><body>
+<nav class="topnav"><div class="logo"><a href="/">Toran Studio</a></div><div class="links"><a href="/">Home</a><a href="/buy">Buy</a><a href="/customize">Customise</a><a href="/cart">Cart</a></div></nav>
+<main style="max-width:900px;margin:0 auto">
+<h2>Your Profile</h2>
+<div id="profileCard" class="card">Loading...</div>
+</main>
+<div id="profilePic"></div>
+<script>
+async function load(){
+  const r = await fetch('/api/me'); const j = await r.json();
+  if(!j.loggedIn){ document.getElementById('profileCard').innerHTML='<p>Please <a href="/auth/google">login</a></p>'; return; }
+  const r2 = await fetch('/api/custom/my'); const j2 = await r2.json();
+  let html = `<img src="${j.user.photo}" class="profileBig"><p><strong>${j.user.name}</strong><br>${j.user.email}</p><h3>Your Custom Requests</h3>`;
+  if(j2.list.length===0) html += '<p>No custom requests</p>'; else j2.list.forEach(it=> html += `<div class="card">${it.status==='approved'?'<span class="customTag">Custom</span>':''} ${it.message} <br>Price: ${it.price||'-'} <br>Comments: ${it.comments||'-'} ${it.image?'<br><img src="'+it.image+'" style="max-width:200px">':''}</div>`);
+  document.getElementById('profileCard').innerHTML = html;
+}
+load();
+</script>
+</body></html>
